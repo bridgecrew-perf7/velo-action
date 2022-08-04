@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "velo-action"
-version = "1.0.79"
+version = "1.0.81"
 description = "Github Action used to generate velo deploy version and trigger a release."
 authors = ["Cloud-platform team <team-cloud-platform@oda.com>"]
 
