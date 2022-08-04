@@ -41,8 +41,11 @@ def request_github_workflow_data(
     for wf_jobs in total_action_dict.values():
         for job in wf_jobs["jobs"]:
             for step in job["steps"]:
-                if step["started_at"] > step["completed_at"]:
-                    step["completed_at"] = step["started_at"]
+                try:
+                    if step["started_at"] > step["completed_at"]:
+                        step["completed_at"] = step["started_at"]
+                except TypeError:
+                    logger.debug(f"{step['name']} has no completed_at")
     return total_action_dict
 
 
