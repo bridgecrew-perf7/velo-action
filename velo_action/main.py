@@ -42,7 +42,10 @@ def action(  # pylint: disable=too-many-branches,too-many-locals,too-many-statem
     """
     init_trace = False
 
-    if args.service_account_key:
+    local_debug_mode = pydantic.parse_obj_as(
+        bool, os.getenv("LOCAL_DEBUG_MODE", "False")
+    )
+    if args.service_account_key or local_debug_mode:
         # Do not init tracer when action is running without a
         # service_account_key.
         # This is supported behavior when only generating the verison.

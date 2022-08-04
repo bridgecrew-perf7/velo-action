@@ -37,6 +37,12 @@ def request_github_workflow_data(
             req = requests.get(f"{workflow_run_url}/jobs", headers=github_headers)
             req.raise_for_status()
             total_action_dict[preceding_wf_name] = req.json()
+
+    for wf_jobs in total_action_dict.values():
+        for job in wf_jobs["jobs"]:
+            for step in job["steps"]:
+                if step["started_at"] > step["completed_at"]:
+                    step["completed_at"] = step["started_at"]
     return total_action_dict
 
 

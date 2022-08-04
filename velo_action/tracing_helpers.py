@@ -25,29 +25,7 @@ def init_tracer(
     args: ActionInputs,
     github_settings: GithubSettings,
 ) -> TracerProvider:
-    jwt_content = json.loads(base64.b64decode(args.service_account_key).decode("ascii"))  # type: ignore
-    iat = time.time() - 10
-    exp = iat + 3600
-    payload = {
-        "iss": jwt_content["client_email"],
-        "sub": jwt_content["client_email"],
-        "aud": "some-cool-internally-nube-app-endpoint",
-        "email": jwt_content["client_email"],
-        "iat": iat,
-        "exp": exp,
-    }
-    additional_headers = {"kid": jwt_content["private_key_id"]}
-    signed_jwt = jwt.encode(
-        payload,
-        jwt_content["private_key"],
-        headers=additional_headers,
-        algorithm="RS256",
-    )
-    headers = {"Authorization": f"Bearer {signed_jwt}"}
-
-    base_url = (
-        f"{github_settings.server_url}/{github_settings.repository}/actions/runs"
-    )
+    base_url = f"{github_settings.server_url}/{github_settings.repository}/actions/runs"
     workflow_url = f"{base_url}/{github_settings.run_id}"
 
     tracing_attributes = {
@@ -59,18 +37,46 @@ def init_tracer(
     resource = Resource(attributes={SERVICE_NAME: "velo-action", **tracing_attributes})
     trace.set_tracer_provider(TracerProvider(resource=resource))
 
-    exporters = [
-        OTLPSpanExporter(
-            endpoint="https://traces-http.infra.nube.tech/v1/traces",
-            headers=headers,
-        ),
-        OTLPSpanExporter(
-            endpoint="https://otel.infra.nube.tech/v1/traces",
-            headers=headers,
-        ),
-    ]
+    # Defaults to local_debug_mode = False
     if pydantic.parse_obj_as(bool, os.getenv("LOCAL_DEBUG_MODE", "False")):
-        exporters = [ConsoleSpanExporter()]
+        exporters = [
+            ConsoleSpanExporter(),
+            OTLPSpanExporter(
+                endpoint="http://localhost:4318/v1/traces",
+            ),
+        ]
+    else:
+        jwt_content = json.loads(base64.b64decode(args.service_account_key).decode("ascii"))  # type: ignore
+        iat = time.time() - 10
+        exp = iat + 3600
+        payload = {
+            "iss": jwt_content["client_email"],
+            "sub": jwt_content["client_email"],
+            "aud": "some-cool-internally-nube-app-endpoint",
+            "email": jwt_content["client_email"],
+            "iat": iat,
+            "exp": exp,
+        }
+        additional_headers = {"kid": jwt_content["private_key_id"]}
+        signed_jwt = jwt.encode(
+            payload,
+            jwt_content["private_key"],
+            headers=additional_headers,
+            algorithm="RS256",
+        )
+        headers = {"Authorization": f"Bearer {signed_jwt}"}
+
+        exporters = [
+            OTLPSpanExporter(
+                endpoint="https://traces-http.infra.nube.tech/v1/traces",
+                headers=headers,
+            ),
+            OTLPSpanExporter(
+                endpoint="https://otel.infra.nube.tech/v1/traces",
+                headers=headers,
+            ),
+        ]
+
     for exporter in exporters:
         trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(exporter))
 
