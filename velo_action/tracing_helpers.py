@@ -16,6 +16,7 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource  # type: ignore
 from opentelemetry.sdk.trace import TracerProvider  # type: ignore
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter  # type: ignore
 from opentelemetry.trace import set_span_in_context
+from opentelemetry.trace.status import Status, StatusCode
 
 from velo_action.github import request_github_workflow_data
 from velo_action.settings import GRAFANA_URL, GithubSettings, ActionInputs
@@ -123,6 +124,8 @@ def trace_jobs(wf_jobs):
         for step in job["steps"]:
             new_step_span = {
                 "name": step["name"],
+                "status": step["status"],
+                "conclusion": step["conclusion"],
                 "start": 0,
                 "end": 0,
                 "sub_spans": [],
@@ -147,6 +150,9 @@ def recurse_add_spans(tracer, parent_span, sub_span_dict):
     sub_span_dict["span"] = span
     for span_dict in sub_span_dict["sub_spans"]:
         recurse_add_spans(tracer, span, span_dict)
+
+    if sub_span_dict.get("status") == "failure":
+        span.set_status(Status(StatusCode.ERROR, sub_span_dict["conclusion"]))
     span.end(sub_span_dict["end"] or None)
 
 
