@@ -119,11 +119,11 @@ def verify_results(tracer, span_list, results_file):
         del span["parent_id"]
 
         # Delete timestamps if they are dynamic
-        et = datetime.fromisoformat(span["end_time"][:-1])
-        if dynamic_end_time - et < timedelta(seconds=1):
+        end = datetime.fromisoformat(span["end_time"][:-1])
+        if dynamic_end_time - end < timedelta(seconds=1):
             del span["end_time"]
-        st = datetime.fromisoformat(span["start_time"][:-1])
-        if dynamic_end_time - st < timedelta(seconds=1):
+        start = datetime.fromisoformat(span["start_time"][:-1])
+        if dynamic_end_time - start < timedelta(seconds=1):
             del span["start_time"]
 
         # See if the span indeed exists
@@ -196,3 +196,4 @@ def test_trace_creation_from_hardcoded_response(mocked_decode: MagicMock):
     )
 
     verify_results(tracer, span_list, "action_trace_output_hardcoded_gh_api.json")
+    mocked_decode.assert_called_once()
