@@ -38,12 +38,24 @@ class SpanList:
     def write(self, span):
         span = json.loads(span)
 
+        del span["resource"]["build.repository"]
+        del span["resource"]["build.actor"]
         del span["context"]["trace_id"]
         del span["context"]["span_id"]
         del span["parent_id"]
 
-        if span["name"] == "build and deploy":
-            del span["end_time"]  # Disregard because of dynamic end_time
+        # Disregard dynamic start and end times
+        utc_local_diff = datetime.now() - datetime.utcnow() + timedelta(seconds=1)
+        if (
+            datetime.now() - datetime.fromisoformat(span["end_time"][:-1])
+            < utc_local_diff
+        ):
+            del span["end_time"]
+        if (
+            datetime.now() - datetime.fromisoformat(span["start_time"][:-1])
+            < utc_local_diff
+        ):
+            del span["start_time"]
 
         self.found_string_spans.append(json.dumps(span))
 
@@ -57,9 +69,7 @@ def create_tracer_and_gh_settings(repo, actor, sha, run_id):
         "build.repository": repo,
         "build.actor": actor,
     }
-    # The trace_provider cannot be overridden so the tracing_attributes are conflicting.
-    # resource = Resource(attributes={SERVICE_NAME: "velo-action", **tracing_attributes})
-    resource = Resource(attributes={SERVICE_NAME: "velo-action"})
+    resource = Resource(attributes={SERVICE_NAME: "velo-action", **tracing_attributes})
     trace.set_tracer_provider(TracerProvider(resource=resource))
 
     span_list = SpanList()
@@ -95,20 +105,11 @@ def verify_results(tracer, span_list, results_file):
     with (Path(__file__).parent / results_file).open("r") as file:
         required_spans = json.load(file)
 
-    found_spans = [json.loads(span) for span in span_list.found_string_spans]
-    for s in found_spans:
-        # Delete dynamically created end and start times
-        if "end_time" in s:
-            if datetime.now() - datetime.fromisoformat(s["end_time"][:-1]) < timedelta(seconds=1, hours=2):
-                del s["end_time"]  # Disregard because of dynamic end_time
-        if datetime.now() - datetime.fromisoformat(s["start_time"][:-1]) < timedelta(seconds=1, hours=2):
-            del s["start_time"]  # Disregard because of dynamic start_time
-
-
     # If no start or end time exists while the spans are created they default to 'now'.
     # The solution is to delete all dynmically created 'now' timestamps from the spans.
     # The end time of the "build and deploy" span is always dynamic so we can delete all timestamps similar to that one.
-    dynamic_end_time = datetime.fromisoformat([s for s in required_spans if s["name"] == "build and deploy"][0]["end_time"][:-1])
+    dynamic_end_time = [s for s in required_spans if s["name"] == "build and deploy"]
+    dynamic_end_time = datetime.fromisoformat(dynamic_end_time[0]["end_time"][:-1])
     for span in required_spans:
         # Delete all dynamic attributes
         del span["resource"]["build.repository"]
@@ -117,20 +118,22 @@ def verify_results(tracer, span_list, results_file):
         del span["context"]["span_id"]
         del span["parent_id"]
 
-        # Delete timestamp if they are dynamic
-        if dynamic_end_time - datetime.fromisoformat(span["end_time"][:-1]) < timedelta(seconds=1):
+        # Delete timestamps if they are dynamic
+        et = datetime.fromisoformat(span["end_time"][:-1])
+        if dynamic_end_time - et < timedelta(seconds=1):
             del span["end_time"]
-        if dynamic_end_time - datetime.fromisoformat(span["start_time"][:-1]) < timedelta(seconds=1):
+        st = datetime.fromisoformat(span["start_time"][:-1])
+        if dynamic_end_time - st < timedelta(seconds=1):
             del span["start_time"]
 
         # See if the span indeed exists
         try:
-            found_spans.remove(span)
+            span_list.found_string_spans.remove(json.dumps(span))
         except ValueError:
             pytest.fail(f"Span {span} not found")
 
     # All spans should have been found so this list should be empty now
-    assert not found_spans
+    assert not span_list.found_string_spans
 
 
 @has_token
