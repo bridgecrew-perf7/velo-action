@@ -342,7 +342,7 @@ libcst = ["libcst (>=0.2.5)"]
 
 [[package]]
 name = "google-cloud-storage"
-version = "2.3.0"
+version = "2.5.0"
 description = "Google Cloud Storage API client library"
 category = "main"
 optional = false
@@ -353,8 +353,10 @@ google-api-core = ">=1.31.5,<2.0.0 || >2.3.0,<3.0.0dev"
 google-auth = ">=1.25.0,<3.0dev"
 google-cloud-core = ">=2.3.0,<3.0dev"
 google-resumable-media = ">=2.3.2"
-protobuf = "*"
 requests = ">=2.18.0,<3.0.0dev"
+
+[package.extras]
+protobuf = ["protobuf (<5.0.0dev)"]
 
 [[package]]
 name = "google-crc32c"
@@ -1365,7 +1367,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.2"
-content-hash = "88b67c9bd517d68e5330edafd91175a84524e067952978f70ae351015a06eafb"
+content-hash = "0f2bf6ffc1a1cb2de03408f1a958282af1d3ac0d4300e329c9b6b7ea7843d18f"
 
 [metadata.files]
 appdirs = [
@@ -1562,8 +1564,8 @@ google-cloud-secret-manager = [
     {file = "google_cloud_secret_manager-2.11.1-py2.py3-none-any.whl", hash = "sha256:41c837a583b904a134e65c2347b60009a10ead00dc040db8570b73bc78a6777f"},
 ]
 google-cloud-storage = [
-    {file = "google-cloud-storage-2.3.0.tar.gz", hash = "sha256:f4cbb0de5e17228e9c09cdc897d81eaa70e2c396f58513f79de0e824584c8f5b"},
-    {file = "google_cloud_storage-2.3.0-py2.py3-none-any.whl", hash = "sha256:9a7b1d07d53bc1df5384a9906c1e6d9c920a2bdb5ffa5982d2c1d2bdaacd70c8"},
+    {file = "google-cloud-storage-2.5.0.tar.gz", hash = "sha256:382f34b91de2212e3c2e7b40ec079d27ee2e3dbbae99b75b1bcd8c63063ce235"},
+    {file = "google_cloud_storage-2.5.0-py2.py3-none-any.whl", hash = "sha256:19a26c66c317ce542cea0830b7e787e8dac2588b6bfa4d3fd3b871ba16305ab0"},
 ]
 google-crc32c = [
     {file = "google-crc32c-1.3.0.tar.gz", hash = "sha256:276de6273eb074a35bc598f8efbc00c7869c5cf2e29c90748fccc8c898c244df"},
