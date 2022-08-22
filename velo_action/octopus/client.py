@@ -4,6 +4,7 @@ from functools import lru_cache
 import requests
 from loguru import logger
 from requests.exceptions import RequestException
+from utils import create_self_signed_jwt
 
 
 class OctopusClient:
@@ -12,9 +13,12 @@ class OctopusClient:
     _cached_tenant_ids: dict = {}
     _headers: dict = {}
 
-    def __init__(self, server=None, api_key=None):
+    def __init__(self, server=None, api_key=None, auth_token=None):
         self.baseurl = server
-        self._headers = {"X-Octopus-ApiKey": f"{api_key}"}
+        self._headers = {
+            "X-Octopus-ApiKey": f"{api_key}",
+            "Authorization": f"Bearer {create_self_signed_jwt(jwt_content=auth_token, url=server)}",
+        }
         self._verify_connection()
 
     def base_url(self):

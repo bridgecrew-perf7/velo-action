@@ -10,7 +10,10 @@ import pytest
 from opentelemetry import trace
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource  # type: ignore
 from opentelemetry.sdk.trace import TracerProvider  # type: ignore
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter  # type: ignore
+from opentelemetry.sdk.trace.export import (  # type: ignore
+    BatchSpanProcessor,
+    ConsoleSpanExporter,
+)
 
 from velo_action.settings import GithubSettings
 from velo_action.tracing_helpers import construct_github_action_trace

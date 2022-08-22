@@ -1,4 +1,8 @@
 import os
+import time
+import json
+import jwt
+from pathlib import Path
 from pathlib import Path
 from typing import List, Optional
 
@@ -16,9 +20,7 @@ def resolve_app_spec_filename(deploy_folder: Path) -> Path:
         filepath = Path.joinpath(deploy_folder, filename)
         if filepath.is_file():
             return filepath
-    raise FileNotFoundError(
-        f"Did not find an app.yml or app.yaml file in '{deploy_folder}'"
-    )
+    raise FileNotFoundError(f"Did not find an app.yml or app.yaml file in '{deploy_folder}'")
 
 
 def read_file(file: Path):
@@ -58,9 +60,7 @@ def read_field_from_app_spec(field: str, filename: Path) -> str:
     raise ValueError(f"Could not find '{field}' in {filename}")
 
 
-def find_matching_version(
-    versions: List[str], version_to_match: SimpleSpec
-) -> Optional[Version]:
+def find_matching_version(versions: List[str], version_to_match: SimpleSpec) -> Optional[Version]:
     """
     Finds the highest matching version in a list of versions.
     using the python semantic_version package.
@@ -68,3 +68,29 @@ def find_matching_version(
     versions = [Version.coerce(v) for v in versions]
     matching_version = version_to_match.select(versions)
     return matching_version
+
+
+def create_self_signed_jwt(jwt_content, url):
+
+    gsa = json.loads(jwt_content)
+
+    iat = time.time()
+    exp = iat + 3600
+    payload = {
+        "email": gsa["client_email"],
+        "iss": gsa["client_email"],
+        "sub": gsa["client_email"],
+        "aud": url,
+        "iat": iat,
+        "exp": exp,
+    }
+    additional_headers = {"kid": gsa["private_key_id"]}
+
+    signed_jwt = jwt.encode(
+        payload,
+        gsa["private_key"],
+        headers=additional_headers,
+        algorithm="RS256",
+    )
+
+    return signed_jwt

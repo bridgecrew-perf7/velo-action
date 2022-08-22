@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.86] - 2022-08-19
+
+- Require Google service account as JSON to authenticate with Auth Proxy
+
 ## [1.0.17] - 2022-05-11
 
 - Improve workflow and release with comments in PRs.

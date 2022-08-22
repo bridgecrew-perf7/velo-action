@@ -84,7 +84,11 @@ def action(  # pylint: disable=too-many-branches,too-many-locals,too-many-statem
         velo_artifact_bucket = gcloud.lookup_data(
             args.velo_artifact_bucket_secret, args.velo_project
         )
-        octo = OctopusClient(server=octopus_server, api_key=octopus_api_key)
+        octo = OctopusClient(
+            server=octopus_server,
+            api_key=octopus_api_key,
+            auth_token=args.service_account_key,
+        )
 
     if args.create_release:
         release = Release(client=octo)

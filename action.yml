@@ -7,7 +7,7 @@ inputs:
       Create a release on Octopus Deploy and save artifacts in the Velo Artifacts bucket.
       If an environment in 'deploy_to_environments' is set, and the release does not exists, one will be created.
     required: false
-    default: 'False'
+    default: "False"
   deploy_to_environments:
     description: |-
       If specified trigger a deployment to the environment.
@@ -23,12 +23,12 @@ inputs:
     description: |-
       Name of the GCP secret containing the Octopus Deploy api key.
     required: false
-    default: 'velo_action_octopus_api_key'
+    default: "velo_action_octopus_api_key"
   octopus_server_secret:
     description: |-
       Name of the GCP secret containing the Octopus Deploy server url.
     required: false
-    default: 'velo_action_octopus_server'
+    default: "velo_action_octopus_server"
   service_account_key:
     description: |-
       A Google Service account key to use for authentication. This should be the JSON
@@ -46,7 +46,7 @@ inputs:
     description: |-
       Name of the GCP secret containing the name of the Velo actifact bucket.
     required: false
-    default: 'velo_action_artifacts_bucket_name'
+    default: "velo_action_artifacts_bucket_name"
   version:
     description: |-
       Version used to generate release and tag image. Defaults to the shortened git hash (`git rev-parse --short HEAD`).
@@ -56,13 +56,13 @@ inputs:
   wait_for_success_seconds:
     description: Waits the given number of seconds until the deployment is completed. The step fails If it does not complete in the given period or if the deployment has an error. A value of 0 will not verify the success or wait for completion.
     required: false
-    default: '0'
+    default: "0"
   wait_for_deployment:
     deprecationMessage: Please use 'wait_for_success_seconds' instead.
     description: |-
       Whether to wait synchronously for deployment in Octopus Deploy to finish.
     required: false
-    default: 'False'
+    default: "False"
   workspace:
     description: |-
       Path to the folder containing the .deploy folder. Default is the root of the repository.
@@ -90,7 +90,7 @@ outputs:
       Version used to crate release and tag image.
 runs:
   using: docker
-  image: 'docker://europe-docker.pkg.dev/nube-hub/docker-public/velo-action:1.0.84'
+  image: "docker://europe-docker.pkg.dev/nube-hub/docker-public/velo-action:1.0.86-nordin-auth-proxy.9"
   args:
     - ${{ inputs.version }}
     - ${{ inputs.create_release }}

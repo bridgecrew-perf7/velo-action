@@ -14,12 +14,15 @@ from opentelemetry.exporter.otlp.proto.http.trace_exporter import (  # type: ign
 )
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource  # type: ignore
 from opentelemetry.sdk.trace import TracerProvider  # type: ignore
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter  # type: ignore
+from opentelemetry.sdk.trace.export import (  # type: ignore
+    BatchSpanProcessor,
+    ConsoleSpanExporter,
+)
 from opentelemetry.trace import set_span_in_context
 from opentelemetry.trace.status import Status, StatusCode
 
 from velo_action.github import request_github_workflow_data
-from velo_action.settings import GRAFANA_URL, GithubSettings, ActionInputs
+from velo_action.settings import GRAFANA_URL, ActionInputs, GithubSettings
 
 
 def init_tracer(
