@@ -90,7 +90,7 @@ outputs:
       Version used to crate release and tag image.
 runs:
   using: docker
-  image: "docker://europe-docker.pkg.dev/nube-hub/docker-public/velo-action:1.0.86"
+  image: "docker://europe-docker.pkg.dev/nube-hub/docker-public/velo-action:1.1.0-nordin-add-backward-compatability-gsa.1"
   args:
     - ${{ inputs.version }}
     - ${{ inputs.create_release }}
