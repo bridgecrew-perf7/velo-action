@@ -94,3 +94,11 @@ def create_self_signed_jwt(jwt_content, url):
     )
 
     return signed_jwt
+
+
+def is_valid_gsa_json(gsa_token_json):
+    try:
+        json.loads(gsa_token_json)
+    except ValueError as e:
+        return False
+    return True

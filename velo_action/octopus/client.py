@@ -4,7 +4,7 @@ from functools import lru_cache
 import requests
 from loguru import logger
 from requests.exceptions import RequestException
-from utils import create_self_signed_jwt
+from utils import create_self_signed_jwt, is_valid_gsa_json
 
 
 class OctopusClient:
@@ -15,10 +15,19 @@ class OctopusClient:
 
     def __init__(self, server=None, api_key=None, auth_token=None):
         self.baseurl = server
-        self._headers = {
-            "X-Octopus-ApiKey": f"{api_key}",
-            "Authorization": f"Bearer {create_self_signed_jwt(jwt_content=auth_token, url=server)}",
-        }
+
+        # GSA needs to be in JSON in order to create self-signed token
+        if auth_token is not None and is_valid_gsa_json(auth_token):
+            self._headers = {
+                "X-Octopus-ApiKey": f"{api_key}",
+                "Authorization": f"Bearer {create_self_signed_jwt(jwt_content=auth_token, url=server)}",
+            }
+        else:
+            logger.warning(
+                "service_account_key needs to be in json. Proceeding without authorization header."
+            )
+            self._headers = {"X-Octopus-ApiKey": f"{api_key}"}
+
         self._verify_connection()
 
     def base_url(self):
@@ -83,9 +92,7 @@ class OctopusClient:
         url = urllib.parse.urljoin(self.baseurl, path)
         try:
             response = requests.request(method, url, json=data, headers=self._headers)
-            logger.debug(
-                f"{response.request.method} {response.url}: {response.status_code}"
-            )
+            logger.debug(f"{response.request.method} {response.url}: {response.status_code}")
         except RequestException as err:
             raise RuntimeError(f"Error connecting to '{url}'. Invalid URL?") from err
         return self._handle_response(response)
@@ -98,9 +105,7 @@ class OctopusClient:
                 "Could not establish connection with Octopus deploy server "
                 f"at '{self.baseurl}'. Failed with '{err}'"
             )
-        logger.debug(
-            f"Successfully connected to Octopus deploy server '{self.baseurl}'"
-        )
+        logger.debug(f"Successfully connected to Octopus deploy server '{self.baseurl}'")
 
     @staticmethod
     def _handle_response(response):
@@ -113,9 +118,7 @@ class OctopusClient:
             if not response.content:
                 return False
             data = response.json()
-            err: str = f"{response.reason}: " + data.get(
-                "ErrorMessage", "Unknown error"
-            )
+            err: str = f"{response.reason}: " + data.get("ErrorMessage", "Unknown error")
 
             errors = data.get("Errors", [])
             if errors:
