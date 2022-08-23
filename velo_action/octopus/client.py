@@ -92,7 +92,9 @@ class OctopusClient:
         url = urllib.parse.urljoin(self.baseurl, path)
         try:
             response = requests.request(method, url, json=data, headers=self._headers)
-            logger.debug(f"{response.request.method} {response.url}: {response.status_code}")
+            logger.debug(
+                f"{response.request.method} {response.url}: {response.status_code}"
+            )
         except RequestException as err:
             raise RuntimeError(f"Error connecting to '{url}'. Invalid URL?") from err
         return self._handle_response(response)
@@ -105,7 +107,9 @@ class OctopusClient:
                 "Could not establish connection with Octopus deploy server "
                 f"at '{self.baseurl}'. Failed with '{err}'"
             )
-        logger.debug(f"Successfully connected to Octopus deploy server '{self.baseurl}'")
+        logger.debug(
+            f"Successfully connected to Octopus deploy server '{self.baseurl}'"
+        )
 
     @staticmethod
     def _handle_response(response):
@@ -118,7 +122,9 @@ class OctopusClient:
             if not response.content:
                 return False
             data = response.json()
-            err: str = f"{response.reason}: " + data.get("ErrorMessage", "Unknown error")
+            err: str = f"{response.reason}: " + data.get(
+                "ErrorMessage", "Unknown error"
+            )
 
             errors = data.get("Errors", [])
             if errors:

@@ -20,7 +20,9 @@ def resolve_app_spec_filename(deploy_folder: Path) -> Path:
         filepath = Path.joinpath(deploy_folder, filename)
         if filepath.is_file():
             return filepath
-    raise FileNotFoundError(f"Did not find an app.yml or app.yaml file in '{deploy_folder}'")
+    raise FileNotFoundError(
+        f"Did not find an app.yml or app.yaml file in '{deploy_folder}'"
+    )
 
 
 def read_file(file: Path):
@@ -60,7 +62,9 @@ def read_field_from_app_spec(field: str, filename: Path) -> str:
     raise ValueError(f"Could not find '{field}' in {filename}")
 
 
-def find_matching_version(versions: List[str], version_to_match: SimpleSpec) -> Optional[Version]:
+def find_matching_version(
+    versions: List[str], version_to_match: SimpleSpec
+) -> Optional[Version]:
     """
     Finds the highest matching version in a list of versions.
     using the python semantic_version package.
