@@ -27,11 +27,11 @@ In order to use the containerized build, use `make run_docker`.
 
 ## Testing
 
-This can be used to test a pre-release or a PR draft. 
+This can be used to test a pre-release or a PR draft.
 
 1. Create a PR.
 2. You may need to update the `action.yml`. The docker image should have the corresponding tag as if you run `make version`. Update `action.yml` with this.
-3. Head over to your repository where you want to test `velo-action` in the workflow. Copy the latest commit hash and add it to `<commit>`. 
+3. Head over to your repository where you want to test `velo-action` in the workflow. Copy the latest commit hash and add it to `<commit>`.
 
     ```yaml
    - name: Use Velo-action
@@ -52,17 +52,17 @@ Manually convert the release from a draft to a release to [release it](https://g
 
    - `+semver: major`
    - `+semver: minor`
-   
-   In short:
-   
+
+In short:
+
 Given a version number MAJOR.MINOR.PATCH, increment the:
 
-    MAJOR version when you make incompatible API changes
-    MINOR version when you add functionality in a backwards compatible manner
-    PATCH version when you make backwards compatible bug fixes
+MAJOR version when you make incompatible API changes
+MINOR version when you add functionality in a backwards compatible manner
+PATCH version when you make backwards compatible bug fixes
 
 Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
 
-2. Update the `changelog.md` with the changes for this release and the upcoming verison.
+1. Update the `changelog.md` with the changes for this release and the upcoming verison.
 
 *IMPORTANT!* A new release will trigger Dependabot. Dependabot will create a PR in all repos that use velo-action.  
