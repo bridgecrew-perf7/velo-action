@@ -104,7 +104,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set image version to '${{ needs.generate-version.outputs.version }}' in action.yml
-        uses: mikefarah/yq@v4.25.1
+        uses: mikefarah/yq@v4.27.3
         with:
           cmd: yq -i '.runs.image = "docker://europe-docker.pkg.dev/nube-hub/docker-public/velo-action:${{ needs.generate-version.outputs.version }}"' action.yml
 

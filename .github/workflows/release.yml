@@ -27,7 +27,7 @@ jobs:
         id: gitversion
 
       - name: Set image version to '${{ steps.gitversion.outputs.version }}' in action.yml
-        uses: mikefarah/yq@v4.25.1
+        uses: mikefarah/yq@v4.27.3
         with:
           cmd: yq -i '.runs.image = "docker://europe-docker.pkg.dev/nube-hub/docker-public/velo-action:${{ steps.gitversion.outputs.version }}"' action.yml
 
