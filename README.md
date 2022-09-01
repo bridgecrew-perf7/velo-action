@@ -37,7 +37,8 @@ This can be used to test a pre-release or a PR draft.
    - name: Use Velo-action
     uses: kolonialno/velo-action@<commit>
     with:
-      service_account_key: ${{ secrets.VELO_ACTION_GSA_KEY_PROD_PUBLIC }}
+      service_account_key: ${{ secrets.VELO_ACTION_GSA_KEY_JSON_PROD }}
+      octopus_server_secret: "octopus-deploy-server-url-auth-proxy"
       ...
     ```
 
